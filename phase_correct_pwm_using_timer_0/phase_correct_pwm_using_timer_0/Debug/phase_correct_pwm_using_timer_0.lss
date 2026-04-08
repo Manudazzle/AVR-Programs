@@ -1,0 +1,215 @@
+
+phase_correct_pwm_using_timer_0.elf:     file format elf32-avr
+
+Sections:
+Idx Name          Size      VMA       LMA       File off  Algn
+  0 .data         00000000  00800100  00800100  0000015c  2**0
+                  CONTENTS, ALLOC, LOAD, DATA
+  1 .text         00000108  00000000  00000000  00000054  2**1
+                  CONTENTS, ALLOC, LOAD, READONLY, CODE
+  2 .comment      00000030  00000000  00000000  0000015c  2**0
+                  CONTENTS, READONLY
+  3 .note.gnu.avr.deviceinfo 00000040  00000000  00000000  0000018c  2**2
+                  CONTENTS, READONLY
+  4 .debug_aranges 00000028  00000000  00000000  000001cc  2**0
+                  CONTENTS, READONLY, DEBUGGING
+  5 .debug_info   00000794  00000000  00000000  000001f4  2**0
+                  CONTENTS, READONLY, DEBUGGING
+  6 .debug_abbrev 000006a8  00000000  00000000  00000988  2**0
+                  CONTENTS, READONLY, DEBUGGING
+  7 .debug_line   000002f8  00000000  00000000  00001030  2**0
+                  CONTENTS, READONLY, DEBUGGING
+  8 .debug_frame  00000034  00000000  00000000  00001328  2**2
+                  CONTENTS, READONLY, DEBUGGING
+  9 .debug_str    000003c2  00000000  00000000  0000135c  2**0
+                  CONTENTS, READONLY, DEBUGGING
+ 10 .debug_loc    000000b4  00000000  00000000  0000171e  2**0
+                  CONTENTS, READONLY, DEBUGGING
+ 11 .debug_ranges 00000018  00000000  00000000  000017d2  2**0
+                  CONTENTS, READONLY, DEBUGGING
+
+Disassembly of section .text:
+
+00000000 <__vectors>:
+   0:	0c 94 34 00 	jmp	0x68	; 0x68 <__ctors_end>
+   4:	0c 94 3e 00 	jmp	0x7c	; 0x7c <__bad_interrupt>
+   8:	0c 94 3e 00 	jmp	0x7c	; 0x7c <__bad_interrupt>
+   c:	0c 94 3e 00 	jmp	0x7c	; 0x7c <__bad_interrupt>
+  10:	0c 94 3e 00 	jmp	0x7c	; 0x7c <__bad_interrupt>
+  14:	0c 94 3e 00 	jmp	0x7c	; 0x7c <__bad_interrupt>
+  18:	0c 94 3e 00 	jmp	0x7c	; 0x7c <__bad_interrupt>
+  1c:	0c 94 3e 00 	jmp	0x7c	; 0x7c <__bad_interrupt>
+  20:	0c 94 3e 00 	jmp	0x7c	; 0x7c <__bad_interrupt>
+  24:	0c 94 3e 00 	jmp	0x7c	; 0x7c <__bad_interrupt>
+  28:	0c 94 3e 00 	jmp	0x7c	; 0x7c <__bad_interrupt>
+  2c:	0c 94 3e 00 	jmp	0x7c	; 0x7c <__bad_interrupt>
+  30:	0c 94 3e 00 	jmp	0x7c	; 0x7c <__bad_interrupt>
+  34:	0c 94 3e 00 	jmp	0x7c	; 0x7c <__bad_interrupt>
+  38:	0c 94 3e 00 	jmp	0x7c	; 0x7c <__bad_interrupt>
+  3c:	0c 94 3e 00 	jmp	0x7c	; 0x7c <__bad_interrupt>
+  40:	0c 94 3e 00 	jmp	0x7c	; 0x7c <__bad_interrupt>
+  44:	0c 94 3e 00 	jmp	0x7c	; 0x7c <__bad_interrupt>
+  48:	0c 94 3e 00 	jmp	0x7c	; 0x7c <__bad_interrupt>
+  4c:	0c 94 3e 00 	jmp	0x7c	; 0x7c <__bad_interrupt>
+  50:	0c 94 3e 00 	jmp	0x7c	; 0x7c <__bad_interrupt>
+  54:	0c 94 3e 00 	jmp	0x7c	; 0x7c <__bad_interrupt>
+  58:	0c 94 3e 00 	jmp	0x7c	; 0x7c <__bad_interrupt>
+  5c:	0c 94 3e 00 	jmp	0x7c	; 0x7c <__bad_interrupt>
+  60:	0c 94 3e 00 	jmp	0x7c	; 0x7c <__bad_interrupt>
+  64:	0c 94 3e 00 	jmp	0x7c	; 0x7c <__bad_interrupt>
+
+00000068 <__ctors_end>:
+  68:	11 24       	eor	r1, r1
+  6a:	1f be       	out	0x3f, r1	; 63
+  6c:	cf ef       	ldi	r28, 0xFF	; 255
+  6e:	d8 e0       	ldi	r29, 0x08	; 8
+  70:	de bf       	out	0x3e, r29	; 62
+  72:	cd bf       	out	0x3d, r28	; 61
+  74:	0e 94 64 00 	call	0xc8	; 0xc8 <main>
+  78:	0c 94 82 00 	jmp	0x104	; 0x104 <_exit>
+
+0000007c <__bad_interrupt>:
+  7c:	0c 94 00 00 	jmp	0	; 0x0 <__vectors>
+
+00000080 <phase_pwm_init>:
+#include <util/delay.h>
+
+void phase_pwm_init()
+{
+	//Step 1: config PD6(OCR0A) as output
+	DDRD |= (1<<DDD6);
+  80:	8a b1       	in	r24, 0x0a	; 10
+  82:	80 64       	ori	r24, 0x40	; 64
+  84:	8a b9       	out	0x0a, r24	; 10
+	
+	// Motor direction
+	DDRD |= (1<<DDD2) | (1<<DDD3); //config PD2 & PD3 as output
+  86:	8a b1       	in	r24, 0x0a	; 10
+  88:	8c 60       	ori	r24, 0x0C	; 12
+  8a:	8a b9       	out	0x0a, r24	; 10
+	PORTD |= (1<<PD2);  //Forward
+  8c:	8b b1       	in	r24, 0x0b	; 11
+  8e:	84 60       	ori	r24, 0x04	; 4
+  90:	8b b9       	out	0x0b, r24	; 11
+	PORTD &= ~(1<<PD3);
+  92:	8b b1       	in	r24, 0x0b	; 11
+  94:	87 7f       	andi	r24, 0xF7	; 247
+  96:	8b b9       	out	0x0b, r24	; 11
+	
+	//Step 2: Selecting phase correct PWM mode
+	TCCR0A |= (1<<WGM00);
+  98:	84 b5       	in	r24, 0x24	; 36
+  9a:	81 60       	ori	r24, 0x01	; 1
+  9c:	84 bd       	out	0x24, r24	; 36
+	TCCR0A &= ~(1<<WGM01);
+  9e:	84 b5       	in	r24, 0x24	; 36
+  a0:	8d 7f       	andi	r24, 0xFD	; 253
+  a2:	84 bd       	out	0x24, r24	; 36
+	TCCR0B &= ~(1<<WGM02);
+  a4:	85 b5       	in	r24, 0x25	; 37
+  a6:	87 7f       	andi	r24, 0xF7	; 247
+  a8:	85 bd       	out	0x25, r24	; 37
+	
+	//Step 3: Choosing Non-inverting mode
+	TCCR0A &= ~(1<<COM0A0);
+  aa:	84 b5       	in	r24, 0x24	; 36
+  ac:	8f 7b       	andi	r24, 0xBF	; 191
+  ae:	84 bd       	out	0x24, r24	; 36
+	TCCR0A |= (1<<COM0A1);
+  b0:	84 b5       	in	r24, 0x24	; 36
+  b2:	80 68       	ori	r24, 0x80	; 128
+  b4:	84 bd       	out	0x24, r24	; 36
+	
+	//Step 4: Selecting Prescalar: 8  (~= 3.9 KHZ)
+	TCCR0B &= ~((1<<CS00) | (1<<CS02));
+  b6:	85 b5       	in	r24, 0x25	; 37
+  b8:	8a 7f       	andi	r24, 0xFA	; 250
+  ba:	85 bd       	out	0x25, r24	; 37
+	TCCR0B |= (1<<CS01);
+  bc:	85 b5       	in	r24, 0x25	; 37
+  be:	82 60       	ori	r24, 0x02	; 2
+  c0:	85 bd       	out	0x25, r24	; 37
+	//  50% Duty Cycle - Motor need to be rotate at 50% speed as per question
+		256* (%value / 100)
+		256*(50 / 100) = 128
+	*/
+	
+	OCR0A =128;
+  c2:	80 e8       	ldi	r24, 0x80	; 128
+  c4:	87 bd       	out	0x27, r24	; 39
+  c6:	08 95       	ret
+
+000000c8 <main>:
+	PORTD |= (1<<PD2);  //Forward
+	PORTD &= ~(1<<PD3);
+} */
+int main(void)
+{
+    phase_pwm_init();
+  c8:	0e 94 40 00 	call	0x80	; 0x80 <phase_pwm_init>
+	//motor_directon();
+	
+    while (1) 
+    {
+		//0 to 128
+		for(uint16_t i=0; i<=128; i++)
+  cc:	80 e0       	ldi	r24, 0x00	; 0
+  ce:	90 e0       	ldi	r25, 0x00	; 0
+  d0:	08 c0       	rjmp	.+16     	; 0xe2 <main+0x1a>
+		{
+			OCR0A = i;
+  d2:	87 bd       	out	0x27, r24	; 39
+	#else
+		//round up by default
+		__ticks_dc = (uint32_t)(ceil(fabs(__tmp)));
+	#endif
+
+	__builtin_avr_delay_cycles(__ticks_dc);
+  d4:	ef e3       	ldi	r30, 0x3F	; 63
+  d6:	fc e9       	ldi	r31, 0x9C	; 156
+  d8:	31 97       	sbiw	r30, 0x01	; 1
+  da:	f1 f7       	brne	.-4      	; 0xd8 <main+0x10>
+  dc:	00 c0       	rjmp	.+0      	; 0xde <main+0x16>
+  de:	00 00       	nop
+	//motor_directon();
+	
+    while (1) 
+    {
+		//0 to 128
+		for(uint16_t i=0; i<=128; i++)
+  e0:	01 96       	adiw	r24, 0x01	; 1
+  e2:	81 38       	cpi	r24, 0x81	; 129
+  e4:	91 05       	cpc	r25, r1
+  e6:	a8 f3       	brcs	.-22     	; 0xd2 <main+0xa>
+  e8:	80 e8       	ldi	r24, 0x80	; 128
+  ea:	90 e0       	ldi	r25, 0x00	; 0
+  ec:	08 c0       	rjmp	.+16     	; 0xfe <main+0x36>
+		}
+		
+		//128 to 0
+		for(uint16_t i=128; i>0; i--)
+		{
+			OCR0A = i;
+  ee:	87 bd       	out	0x27, r24	; 39
+  f0:	ef e3       	ldi	r30, 0x3F	; 63
+  f2:	fc e9       	ldi	r31, 0x9C	; 156
+  f4:	31 97       	sbiw	r30, 0x01	; 1
+  f6:	f1 f7       	brne	.-4      	; 0xf4 <main+0x2c>
+  f8:	00 c0       	rjmp	.+0      	; 0xfa <main+0x32>
+  fa:	00 00       	nop
+			OCR0A = i;
+			_delay_ms(10);
+		}
+		
+		//128 to 0
+		for(uint16_t i=128; i>0; i--)
+  fc:	01 97       	sbiw	r24, 0x01	; 1
+  fe:	00 97       	sbiw	r24, 0x00	; 0
+ 100:	b1 f7       	brne	.-20     	; 0xee <main+0x26>
+ 102:	e4 cf       	rjmp	.-56     	; 0xcc <main+0x4>
+
+00000104 <_exit>:
+ 104:	f8 94       	cli
+
+00000106 <__stop_program>:
+ 106:	ff cf       	rjmp	.-2      	; 0x106 <__stop_program>
